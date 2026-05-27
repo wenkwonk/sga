@@ -1,3 +1,5 @@
+### Spatio-Graphical Arbitrator (SGA)
+
 ### TECH STACK
 
 ### 1. Perception & Keypoint Extraction Layer
