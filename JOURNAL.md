@@ -29,5 +29,5 @@
 * **[AD]** Fully integrated `feature_extraction.py` into `visualize_mapping.py` so that `visualize_mapping.py` calls `feature_extraction.py` automatically when a .json is not already detected.
 * **[AD]** Cleaned up `visualize_mapping.py` UI
 * **[AD]** Cleaned up repository by removing dead files.
-* **[AD]** **To-Do** Tune player detection. Players still blip in and out of detection when overlapping. Sidelines are still crowded and introduce noise. Might be time to start using Bytetrack
-* **[AD]** **To-Do** Maybe add contracts?
+* **[AD]** **To-Do:** Tune player detection. Players still blip in and out of detection when overlapping. Sidelines are still crowded and introduce noise. Might be time to start using Bytetrack
+* **[AD]** **To-Do:** Maybe add contracts?
