@@ -25,3 +25,6 @@ SGA does not call fouls. It does not claim to know the rules better than a licen
 ### 4. Cognitive Sequence Inference Layer
 * **Spatio-Temporal Graph Convolutional Networks (ST-GCN):** The core deep-learning classification engine. Built on pure **PyTorch**, the ST-GCN evaluates how the spatial graphs evolve over time (sequence length of ~90 frames). It extracts temporal patterns (e.g., sudden deceleration upon arm contact or illegal sliding footwork) to flag infractions.
 * **Classification Head:** A Softmax inference layer that transforms multi-dimensional spatiotemporal embeddings into definitive rule infraction probabilities (e.g., `Shooting Foul: 94.2%`, `Clean Play: 5.8%`).
+
+## Note: Model Weights
+To keep this repository lightweight, all machine learning model weights (`.pt` files) and local training logs (`runs/`) are excluded from version control via `.gitignore`.
