@@ -1,3 +1,13 @@
+### Spatio-Graphical Arbitrator (SGA)
+
+Spatio-Graphical Arbitrator (SGA) is an AI-powered referee consistency auditing system for NBA officiating.
+
+NBA refereeing has been inconsistent since the league's inception. However, in recent years, the gap between officiated basketball and fair basketball has become impossible to ignore. At its worst, a single referee can functionally decide a playoff series outcome.
+
+No referee embodies this more than Scott Foster, knwon as "The Extender", having earned his nickname because teams trailing in a playoff series have often won, thus lengthening the series. SGA exists because the questionable calls deserve a rigorous, data-driven answer, and the league has shown no interest in providing one.
+
+SGA does not call fouls. It does not claim to know the rules better than a licensed official. What it does is hold referees accountable to their own established standard within a game, for example flagging when the threshold for a foul call in Q4 has silently shifted from what it was in Q1. 
+
 ### TECH STACK
 
 ### 1. Perception & Keypoint Extraction Layer
