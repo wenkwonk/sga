@@ -5,7 +5,9 @@ import json
 import numpy as np
 
 #pathing
-project_root = "/Users/USERNAME/Desktop/SGA"
+script_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in locals() else os.getcwd()
+project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
@@ -186,14 +188,20 @@ def on_trackbar_change(val):
 def main():
     global cap, court_blueprint_master, tracking_database, window_name, current_frame_idx, is_playing
     
-    #video files config
-    VIDEO_PATH = os.path.join(project_root, "data", "raw", "foul_sample_1.mp4")
-    JSON_OUTPUT_PATH = os.path.join(project_root, "data", "processed", "court_out", "foul_sample_1_dynamic.json")
+    #video pathing
+    # VIDEO_NAME = "foul_sample_1.mp4"
+    VIDEO_NAME = "curry_sample.mp4"
+    # VIDEO_NAME = "shot_sample_1.mp4"
+    VIDEO_PATH = os.path.join(project_root, "data", "raw", VIDEO_NAME)
+    video_base_name = os.path.splitext(VIDEO_NAME)[0] 
+    json_filename = f"{video_base_name}_dynamic.json"
+    
+    JSON_OUTPUT_PATH = os.path.join(project_root, "data", "processed", "court_out", json_filename)
 
     #verify database matrix presence
     if not os.path.exists(JSON_OUTPUT_PATH):
-        print("Tracking database file not found! Automatically calling headless AI tracker script...")
-        success = run_headless_tracker()
+        print(f"Tracking database not found for {VIDEO_NAME}! Automatically calling headless AI tracker script...")
+        success = run_headless_tracker(video_name=VIDEO_NAME) 
         if not success or not os.path.exists(JSON_OUTPUT_PATH):
             print("Error: Headless tracking pipeline failed to generate file matrix.")
             return
@@ -228,7 +236,7 @@ def main():
             
         if is_playing:
             current_frame_idx += 1
-            if current_frame_idx >= total_frames or current_frame_idx >= len(tracking_database):
+            if current_frame_idx >= total_frames:
                 current_frame_idx = 0  
 
     cap.release()

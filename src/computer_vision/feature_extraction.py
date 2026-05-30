@@ -13,15 +13,22 @@ if project_root not in sys.path:
 
 from src.computer_vision.homography import CourtHomographyTransformer
 
-def main():
-    #asset paths
-    VIDEO_PATH = os.path.join(project_root, "data", "raw", "foul_sample_1.mp4")
+def main(video_name=None):
+    #fallback to default if no filename is supplied by the caller
+    if video_name is None:
+        video_name = "foul_sample_1.mp4"
+
+    #pathing
+    VIDEO_PATH = os.path.join(project_root, "data", "raw", video_name)
     PAINT_MODEL_PATH = os.path.join(project_root, "runs", "pose", "paint_detector", "weights", "best.pt")
-    JSON_OUTPUT_PATH = os.path.join(project_root, "data", "processed", "court_out", "foul_sample_1_dynamic.json")
+    
+    video_base_name = os.path.splitext(video_name)[0]
+    json_filename = f"{video_base_name}_dynamic.json"
+    JSON_OUTPUT_PATH = os.path.join(project_root, "data", "processed", "court_out", json_filename)
     os.makedirs(os.path.dirname(JSON_OUTPUT_PATH), exist_ok=True)
 
     if not os.path.exists(VIDEO_PATH) or not os.path.exists(PAINT_MODEL_PATH):
-        print("Error: Missing assets! Verify path alignments.")
+        print(f"Error: Missing assets! Verify paths:\nVideo: {VIDEO_PATH}\nModel: {PAINT_MODEL_PATH}")
         return False
 
     #init ai models
