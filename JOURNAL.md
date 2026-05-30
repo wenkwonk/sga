@@ -27,7 +27,11 @@
 * **[AD]** Corrected right side paint detection bug from May 28. This was achieved by the collection of new data bringing our dataset to 120 data points (96 train 24 val) and retraining the custom paint detector
 * **[AD]** Renamed `tracker.py` to `feature_extraction.py`
 * **[AD]** Fully integrated `feature_extraction.py` into `visualize_mapping.py` so that `visualize_mapping.py` calls `feature_extraction.py` automatically when a .json is not already detected.
-* **[AD]** Cleaned up `visualize_mapping.py` UI
+* **[AD]** Cleaned up `visualize_mapping.py` UI.
 * **[AD]** Cleaned up repository by removing dead files.
-* **[AD]** **To-Do:** Tune player detection. Players still blip in and out of detection when overlapping. Sidelines are still crowded and introduce noise. Might be time to start using Bytetrack
+* **[AD]** **To-Do:** Tune player detection. Players still blip in and out of detection when overlapping. Sidelines are still crowded and introduce noise. Might be time to start using Bytetrack.
 * **[AD]** **To-Do:** Maybe add contracts?
+
+## May 29, 2026 - Pipeline Cleaning
+* **[AD]** Un-hardcoded video file pathing in `feature_extraction.py` and `visualize_mapping.py`.
+* **[AD]** Un-hardcoded .json file naming from `feature_extraction.py` to make handoff more dynamic.
