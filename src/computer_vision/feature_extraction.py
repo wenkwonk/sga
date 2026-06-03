@@ -21,6 +21,7 @@ def main(video_name=None):
     #pathing
     VIDEO_PATH = os.path.join(project_root, "data", "raw", video_name)
     PAINT_MODEL_PATH = os.path.join(project_root, "runs", "pose", "paint_detector", "weights", "best.pt")
+    TRACKER_CONFIG_PATH = os.path.join(current_dir, "botsort_config.yaml")
     
     video_base_name = os.path.splitext(video_name)[0]
     json_filename = f"{video_base_name}_dynamic.json"
@@ -48,8 +49,19 @@ def main(video_name=None):
             break
 
         #model inference
-        paint_res = paint_model.predict(source=frame, conf=0.25, device="mps", verbose=False)[0]
-        player_res = player_model.track(source=frame, conf=0.4, classes=[0], persist=True, device="mps", verbose=False)[0]
+        paint_res = paint_model.predict(source=frame, 
+                                        conf=0.25, 
+                                        device="mps", 
+                                        verbose=False)[0]
+        player_res = player_model.track(
+                                        source=frame,
+                                        conf=0.15,                       
+                                        tracker="botsort.yaml",     
+                                        classes=[0], 
+                                        persist=True, 
+                                        device="mps", 
+                                        verbose=False
+                                    )[0]
 
         H = None
         detected_side = "unknown"
@@ -78,17 +90,29 @@ def main(video_name=None):
                     H = transformer.compute_matrix(ordered_corners, side=detected_side)
 
         #process players
-        if player_res.boxes is not None and player_res.keypoints is not None:
-            track_ids = player_res.boxes.id.int().cpu().tolist() if player_res.boxes.id is not None else [0] * len(player_res.boxes)
-            keypoints_tensor = player_res.keypoints.xy.cpu().tolist()
+        if player_res.boxes is not None and len(player_res.boxes) > 0:
             boxes_tensor = player_res.boxes.xyxy.cpu().tolist()
+            
+            if player_res.boxes.id is not None:
+                track_ids = player_res.boxes.id.int().cpu().tolist()
+            else:
+                track_ids = [-1] * len(boxes_tensor)
 
-            for idx, player_id in enumerate(track_ids):
-                kp = keypoints_tensor[idx]
-                box = boxes_tensor[idx]
+            has_kps = player_res.keypoints is not None and len(player_res.keypoints.xy) > 0
+            keypoints_tensor = player_res.keypoints.xy.cpu().tolist() if has_kps else []
+
+            for idx, (box, player_id) in enumerate(zip(boxes_tensor, track_ids)):
+                kp = keypoints_tensor[idx] if idx < len(keypoints_tensor) else None
                 
-                foot_x = (kp[15][0] + kp[16][0]) / 2 if len(kp) > 16 else (box[0] + box[2]) / 2
-                foot_y = (kp[15][1] + kp[16][1]) / 2 if len(kp) > 16 else box[3]
+                foot_x = (box[0] + box[2]) / 2
+                foot_y = box[3]
+
+                if kp and len(kp) > 16:
+                    left_ankle = kp[15]
+                    right_ankle = kp[16]
+                    if left_ankle[0] > 0 and right_ankle[0] > 0:
+                        foot_x = (left_ankle[0] + right_ankle[0]) / 2
+                        foot_y = (left_ankle[1] + right_ankle[1]) / 2
 
                 clean_coords = [0.0, 0.0]
                 if H is not None:
@@ -100,7 +124,7 @@ def main(video_name=None):
 
                 #format strictly to raw ints
                 int_box = [int(box[0]), int(box[1]), int(box[2]), int(box[3])]
-                int_skeleton = [[int(pt[0]), int(pt[1])] for pt in kp]
+                int_skeleton = [[int(pt[0]), int(pt[1])] for pt in kp] if kp else []
 
                 #save flat row to ledger
                 json_payload.append({
