@@ -35,3 +35,8 @@
 ## May 29, 2026 - Pipeline Cleaning
 * **[AD]** Un-hardcoded video file pathing in `feature_extraction.py` and `visualize_mapping.py`.
 * **[AD]** Un-hardcoded .json file naming from `feature_extraction.py` to make handoff more dynamic.
+
+## June 3, 2026 - Player Tracking Model Change & Claude
+* **[AD]** Changed player tracking model to botsort to improve player ID.
+* **[AD]** **Challenge:** Tracking is still weak. Post-processing is likely the best way to move forward.
+* **[AD]** Set up a CLAUDE.md based on Karpathy's template.
