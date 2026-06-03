@@ -40,3 +40,4 @@
 * **[AD]** Changed player tracking model to botsort to improve player ID.
 * **[AD]** **Challenge:** Tracking is still weak. Post-processing is likely the best way to move forward.
 * **[AD]** Set up a CLAUDE.md based on Karpathy's template.
+* **[AD]** Added `time` architecture to `visualize_mapping.py` playback architecture to make playback real-time.
