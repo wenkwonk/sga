@@ -3,6 +3,7 @@ import sys
 import cv2
 import json
 import numpy as np
+import time  # added for precision clock tracking
 
 #pathing
 script_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in locals() else os.getcwd()
@@ -92,7 +93,10 @@ is_playing = False
 def get_dashboard_image(val):
     global cap, court_blueprint_master, tracking_database, is_playing
     
-    cap.set(cv2.CAP_PROP_POS_FRAMES, val)
+    #performance optimization: only force track seek if index falls out of sync
+    if int(cap.get(cv2.CAP_PROP_POS_FRAMES)) != val:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, val)
+        
     ret, video_frame = cap.read()
     if not ret or video_frame is None:
         return None
@@ -214,17 +218,37 @@ def main():
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     court_blueprint_master = generate_native_court()
 
+    #calculate precision framerate mechanics
+    video_fps = cap.get(cv2.CAP_PROP_FPS)
+    if video_fps <= 0:
+        video_fps = 30.0  # fallback safety framework
+    frame_duration = 1.0 / video_fps
+    last_frame_time = time.time()
+
     cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
     cv2.createTrackbar("Timeline", window_name, 0, total_frames - 1, on_trackbar_change)
 
     #timeline event loop
     while True:
+        #clock sync validation for playback frame updates
+        if is_playing:
+            now = time.time()
+            elapsed = now - last_frame_time
+            
+            #advance frame index step calculations based on elapsed physical time
+            if elapsed >= frame_duration:
+                frames_to_advance = int(elapsed // frame_duration)
+                current_frame_idx += frames_to_advance
+                
+                if current_frame_idx >= total_frames:
+                    current_frame_idx = 0  # handling simple end loop wrap
+                    
+                last_frame_time = now - (elapsed % frame_duration)
+                cv2.setTrackbarPos("Timeline", window_name, current_frame_idx)
+
         img = get_dashboard_image(current_frame_idx)
         if img is not None:
             cv2.imshow(window_name, img)
-            
-        if is_playing:
-            cv2.setTrackbarPos("Timeline", window_name, current_frame_idx)
 
         delay = 1 if is_playing else 100
         key = cv2.waitKey(delay) & 0xFF
@@ -233,11 +257,8 @@ def main():
             break
         elif key == ord(' '):  
             is_playing = not is_playing  
-            
-        if is_playing:
-            current_frame_idx += 1
-            if current_frame_idx >= total_frames:
-                current_frame_idx = 0  
+            if is_playing:
+                last_frame_time = time.time()  # flush delta tracking on play state resume
 
     cap.release()
     cv2.destroyAllWindows()
